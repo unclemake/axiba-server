@@ -61,10 +61,10 @@ class Socket {
         var io = socketIO(server);
         io.on('connection', (client) => {
             this.socket = client;
+            this.event();
         });
         server.listen(config.devPort);
 
-        this.event();
     }
 
     /**
@@ -160,13 +160,13 @@ class DevFile {
         ]
 
         fileArray.forEach(value => {
-            content += this.addDefine(this.getFile(value), `src/${value}.js`);
+            content += this.addDefine(this.getFile(value), `${value}.js`);
         })
 
-        let mF = nodeFile.getFile('socket.io-client');
+        let mF = nodeFile.getFileString('socket.io-client');
         content += this.addDefine(mF, 'socket.io-client', '');
 
-        content += `seajs.use('${this.devPath}/src/webDev/dev.js')`;
+        content += `seajs.use('${this.devPath}/web/index.js');\n`;
 
         return content;
     }

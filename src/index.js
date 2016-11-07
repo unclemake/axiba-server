@@ -55,9 +55,9 @@ class Socket {
         var io = socketIO(server);
         io.on('connection', (client) => {
             this.socket = client;
+            this.event();
         });
         server.listen(config_1.default.devPort);
-        this.event();
     }
     /**
      * 刷新web页面
@@ -135,11 +135,11 @@ class DevFile {
             'web/socket-client'
         ];
         fileArray.forEach(value => {
-            content += this.addDefine(this.getFile(value), `src/${value}.js`);
+            content += this.addDefine(this.getFile(value), `${value}.js`);
         });
-        let mF = axiba_npm_dependencies_1.default.getFile('socket.io-client');
+        let mF = axiba_npm_dependencies_1.default.getFileString('socket.io-client');
         content += this.addDefine(mF, 'socket.io-client', '');
-        content += `seajs.use('${this.devPath}/src/webDev/dev.js')`;
+        content += `seajs.use('${this.devPath}/web/index.js');\n`;
         return content;
     }
 }

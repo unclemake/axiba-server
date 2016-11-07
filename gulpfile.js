@@ -5,7 +5,7 @@ const sourcemaps = require('gulp-sourcemaps');;
 
 gulp.task('default', function () {
 
-    return gulp.watch(['src/**/*.?(tsx|ts)', 'test/**/*.?(tsx|ts)'], function (event) {
+    return gulp.watch(['src/**/*.?(tsx|ts)', 'test/**/*.?(tsx|ts)', 'web/**/*.?(tsx|ts)'], function (event) {
         console.log(event.path);
         ts(event.path);
     });
