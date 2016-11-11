@@ -1,6 +1,10 @@
 {
+  "files": [
+    "src/",
+    "web/"
+  ],
   "name": "axiba-server",
-  "version": "0.0.1",
+  "version": "0.0.2-dev",
   "description": "",
   "typings": "src/index.ts",
   "main": "src/index.js",
