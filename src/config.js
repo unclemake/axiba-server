@@ -1,9 +1,7 @@
 "use strict";
 let config = {
     //web访问端口
-    webPort: 666,
-    //开发长连接端口
-    devPort: 555,
+    webPort: 999,
     //默认文件
     mainPath: 'index.html'
 };

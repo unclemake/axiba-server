@@ -1,8 +1,7 @@
-import config from '../src/config';
 import * as io from 'socket.io-client';
 
 export function run() {
-    var socket = io.connect(`http://localhost:${config.devPort}/`);
+    var socket = io.connect(`/`);
     socket.on('reload', function (msg) {
         window.location.reload();
     });

@@ -6,7 +6,7 @@ import config from './config';
 import open = require("open");
 import * as ph from 'path';
 import nodeFile from 'axiba-npm-dependencies';
-
+var bodyParser = require('body-parser');
 var record = require('./record.json');
 
 /**
@@ -23,10 +23,38 @@ class Server {
      */
     constructor() {
         var app = express();
+        app.use(bodyParser.json()); // for parsing application/json
+        app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
         app.get('/', function (req, res) {
             res.sendfile(config.mainPath);
         });
+
+        app.post('/data', (req, res) => {
+            res.json(req.body);
+        });
+
+
+        app.post('/msg', (req, res) => {
+            res.send('文本');
+        });
+
+        app.get('/sse', function (req, res) {
+            res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", "Connection": "keep-alive" });
+            res.write("retry: 10000\n");
+            let data = {
+                url: '/assets/components/nav/index.tsx',
+                data: {
+                    unread: 1
+                }
+            }
+            res.write("data: " + JSON.stringify(data) + "\n\n");
+            setInterval(function () {
+                data.data.unread++;
+                res.write("data: " + JSON.stringify(data) + "\n\n");
+            }, 1000);
+        });
+
 
         /**
          * 监听 666
@@ -34,38 +62,20 @@ class Server {
         var server = app.listen(config.webPort, function () {
             var host = server.address().address;
             var port = server.address().port;
-            console.log('Example app listening at http://%s:%s', host, port);
+            console.log('已经启动 http://localhost:%s', port);
+        });
+
+        var io = socketIO(server);
+        io.on('connection', (client) => {
+            this.socket = client;
+            this.event();
         });
 
         //静态文件访问
         app.use(express.static('./'));
 
     }
-}
 
-
-/**
- * 长连接
- * 
- * @class Socket
- */
-class Socket {
-    /**
-     * Creates an instance of Socket.
-     * 
-     * 
-     * @memberOf Socket
-     */
-    constructor() {
-        var server = http.createServer();
-        var io = socketIO(server);
-        io.on('connection', (client) => {
-            this.socket = client;
-            this.event();
-        });
-        server.listen(config.devPort);
-
-    }
 
     /**
      * 连接
@@ -82,7 +92,9 @@ class Socket {
      * @memberOf Socket
      */
     reload() {
-        this.socket.emit('reload', {});
+        if (this.socket) {
+            this.socket.emit('reload', {});
+        }
     }
 
     /**
@@ -95,9 +107,12 @@ class Socket {
         this.socket.on('message', function (data) {
             console.log(data);
         });
+
+        this.socket.on('test', (data) => {
+            this.socket.emit('test', { nu: 1 });
+        });
     }
 }
-
 
 
 /**
@@ -175,7 +190,20 @@ class DevFile {
 let server: Server;
 let devFile = new DevFile();
 
-export let socket: Socket;
+
+
+/**
+ * 获得devfile
+ * 
+ * @export
+ * @returns
+ */
+export function reload() {
+    if (server) {
+        server.reload();
+    }
+}
+
 
 /**
  * 运行服务器
@@ -184,7 +212,6 @@ export let socket: Socket;
  */
 export function run() {
     server = new Server();
-    socket = new Socket();
 }
 
 /**

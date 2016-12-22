@@ -4,7 +4,7 @@
     "web/"
   ],
   "name": "axiba-server",
-  "version": "0.0.2-dev",
+  "version": "0.0.6-dev",
   "description": "",
   "typings": "src/index.ts",
   "main": "src/index.js",
@@ -21,6 +21,7 @@
     "@types/open": "0.0.29",
     "@types/socket.io": "^1.4.27",
     "@types/socket.io-client": "^1.4.28",
+    "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "open": "0.0.5",
     "socket.io": "^1.5.1",

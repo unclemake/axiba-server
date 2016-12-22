@@ -1,8 +1,7 @@
 "use strict";
-const config_1 = require('../src/config');
 const io = require('socket.io-client');
 function run() {
-    var socket = io.connect(`http://localhost:${config_1.default.devPort}/`);
+    var socket = io.connect(`/`);
     socket.on('reload', function (msg) {
         window.location.reload();
     });
