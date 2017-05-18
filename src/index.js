@@ -9,6 +9,7 @@ const ph = require('path');
 const axiba_npm_dependencies_1 = require('axiba-npm-dependencies');
 var bodyParser = require('body-parser');
 var record = require('./record.json');
+const axiba_dependencies_1 = require('axiba-dependencies');
 /**
  * 静态服务器
  *
@@ -71,9 +72,9 @@ class Server {
      *
      * @memberOf Socket
      */
-    reload() {
+    reload(obj) {
         if (this.socket) {
-            this.socket.emit('reload', {});
+            this.socket.emit('reload', obj);
         }
     }
     /**
@@ -117,7 +118,15 @@ class DevFile {
      * @memberOf DevFile
      */
     addDefine(content, path, devPaths = this.devPath) {
-        content = `\ndefine("${devPaths ? devPaths + '/' : ''}${path}",function(require, exports, module) {\n${content}\n});\n`;
+        let depObject = axiba_dependencies_1.default.getDependencies({
+            contents: content,
+            path: path
+        });
+        let depString = '[]';
+        if (depObject) {
+            depString = JSON.stringify(depObject.dependent);
+        }
+        content = `\ndefine("${devPaths ? devPaths + '/' : ''}${path}",${depString},function(require, exports, module) {\n${content}\n});\n`;
         return content;
     }
     /**
@@ -150,7 +159,7 @@ class DevFile {
         });
         let mF = axiba_npm_dependencies_1.default.getFileString('socket.io-client');
         content += this.addDefine(mF, 'socket.io-client', '');
-        content += `seajs.use('${this.devPath}/web/index.js');\n`;
+        content += `axibaModular.run('${this.devPath}/web/index.js');\n`;
         return content;
     }
 }
@@ -162,9 +171,9 @@ let devFile = new DevFile();
  * @export
  * @returns
  */
-function reload() {
+function reload(file) {
     if (server) {
-        server.reload();
+        server.reload(file);
     }
 }
 exports.reload = reload;

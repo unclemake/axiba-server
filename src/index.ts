@@ -8,6 +8,7 @@ import * as ph from 'path';
 import nodeFile from 'axiba-npm-dependencies';
 var bodyParser = require('body-parser');
 var record = require('./record.json');
+import { default as dep, DependenciesModel } from 'axiba-dependencies';
 
 /**
  * 静态服务器
@@ -91,9 +92,9 @@ class Server {
      * 
      * @memberOf Socket
      */
-    reload() {
+    reload(obj) {
         if (this.socket) {
-            this.socket.emit('reload', {});
+            this.socket.emit('reload', obj);
         }
     }
 
@@ -142,7 +143,17 @@ class DevFile {
      * @memberOf DevFile
      */
     addDefine(content, path, devPaths: string = this.devPath) {
-        content = `\ndefine("${devPaths ? devPaths + '/' : ''}${path}",function(require, exports, module) {\n${content}\n});\n`;
+
+        let depObject = dep.getDependencies({
+            contents: content,
+            path: path
+        } as any);
+        let depString = '[]';
+        if (depObject) {
+            depString = JSON.stringify(depObject.dependent);
+        }
+
+        content = `\ndefine("${devPaths ? devPaths + '/' : ''}${path}",${depString},function(require, exports, module) {\n${content}\n});\n`;
         return content;
     }
 
@@ -181,7 +192,7 @@ class DevFile {
         let mF = nodeFile.getFileString('socket.io-client');
         content += this.addDefine(mF, 'socket.io-client', '');
 
-        content += `seajs.use('${this.devPath}/web/index.js');\n`;
+        content += `axibaModular.run('${this.devPath}/web/index.js');\n`;
 
         return content;
     }
@@ -198,9 +209,9 @@ let devFile = new DevFile();
  * @export
  * @returns
  */
-export function reload() {
+export function reload(file) {
     if (server) {
-        server.reload();
+        server.reload(file);
     }
 }
 
