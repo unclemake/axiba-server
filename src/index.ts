@@ -28,7 +28,7 @@ class Server {
         app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
         app.get('/', function (req, res) {
-            res.sendfile(config.mainPath);
+            res.sendFile(config.mainPath);
         });
 
         app.post('/data', (req, res) => {
@@ -149,6 +149,7 @@ class DevFile {
             path: path
         } as any);
         let depString = '[]';
+
         if (depObject) {
             depString = JSON.stringify(depObject.dependent);
         }
@@ -201,6 +202,8 @@ class DevFile {
 let server: Server;
 let devFile = new DevFile();
 
+
+export { server };
 
 
 /**

@@ -27,7 +27,7 @@ class Server {
         app.use(bodyParser.json()); // for parsing application/json
         app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
         app.get('/', function (req, res) {
-            res.sendfile(config_1.default.mainPath);
+            res.sendFile(config_1.default.mainPath);
         });
         app.post('/data', (req, res) => {
             res.json(req.body);
@@ -164,6 +164,7 @@ class DevFile {
     }
 }
 let server;
+exports.server = server;
 let devFile = new DevFile();
 /**
  * 获得devfile
